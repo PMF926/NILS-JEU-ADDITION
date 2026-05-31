@@ -196,6 +196,13 @@ function maybeSwapAddends(first, second) {
   return Math.random() < 0.5 ? [first, second] : [second, first];
 }
 
+function buildOneDigitAddendsAboveTen() {
+  const first = randomInt(2, 9);
+  const second = randomInt(11 - first, 9);
+
+  return maybeSwapAddends(first, second);
+}
+
 function buildMixedAddends(hasCarry) {
   const oneDigit = hasCarry ? randomInt(2, 9) : randomInt(1, 9);
   const unit = hasCarry ? randomInt(11 - oneDigit, 9) : randomInt(0, Math.min(9, 10 - oneDigit));
@@ -233,8 +240,7 @@ function buildQuestion() {
   } else if (additionType === "2-2-carry") {
     [first, second] = buildTwoDigitAddends(true);
   } else {
-    first = randomInt(1, 9);
-    second = randomInt(1, 9);
+    [first, second] = buildOneDigitAddendsAboveTen();
   }
 
   state.correctAnswer = first + second;
