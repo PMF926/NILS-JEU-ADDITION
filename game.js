@@ -3,8 +3,11 @@ const BEST_SCORE_KEY = "reflexe-eclair-best-score";
 const SETTINGS_KEY = "nils-calcul-settings";
 const ADDITION_TYPES = [
   { id: "1-1", label: "1 + 1", scoreBonus: 0 },
+  { id: "missing-1-1", label: "1 + 1 à trou", scoreBonus: 50 },
   { id: "mixed-no-carry", label: "1 + 2 ou 2 + 1 sans retenue", scoreBonus: 80 },
+  { id: "missing-mixed-no-carry", label: "1 + 2 ou 2 + 1 à trou sans retenue", scoreBonus: 120 },
   { id: "mixed-carry", label: "1 + 2 ou 2 + 1 avec retenue", scoreBonus: 130 },
+  { id: "missing-mixed-carry", label: "1 + 2 ou 2 + 1 à trou avec retenue", scoreBonus: 170 },
   { id: "2-2-no-carry", label: "2 + 2 sans retenue", scoreBonus: 170 },
   { id: "2-2-carry", label: "2 + 2 avec retenue", scoreBonus: 230 },
 ];
@@ -56,6 +59,8 @@ const state = {
   lives: MAX_LIVES,
   correctAnswer: 0,
   currentQuestion: "",
+  currentCorrection: "",
+  answerMode: "sum",
   mistakes: [],
   roundLimit: 10,
   roundStartedAt: 0,
@@ -143,6 +148,7 @@ function updateHud() {
 function syncSettingControls(settings = state.settings) {
   const additionType = getAdditionType(settings.additionType);
 
+  elements.additionTypeSetting.max = ADDITION_TYPES.length - 1;
   elements.additionTypeSetting.value = getAdditionTypeIndex(additionType.id);
   elements.additionTypeValue.textContent = additionType.label;
   elements.questionsSetting.value = settings.questions;
@@ -226,15 +232,47 @@ function buildTwoDigitAddends(hasCarry) {
   return [tenA + unitA, tenB + unitB];
 }
 
+function setSumQuestion(first, second) {
+  state.answerMode = "sum";
+  state.correctAnswer = first + second;
+  state.currentQuestion = `${first} + ${second}`;
+  state.currentCorrection = `${state.currentQuestion} = ${state.correctAnswer}`;
+}
+
+function setMissingAddendQuestion(first, second) {
+  const hideFirst = first < 10 && (second >= 10 || Math.random() < 0.5);
+  const missing = hideFirst ? first : second;
+  const visible = hideFirst ? second : first;
+  const total = first + second;
+
+  state.answerMode = "digit";
+  state.correctAnswer = missing;
+  state.currentQuestion = hideFirst ? `_ + ${visible} = ${total}` : `${visible} + _ = ${total}`;
+  state.currentCorrection = `${first} + ${second} = ${total}`;
+}
+
 function buildQuestion() {
   let first;
   let second;
+  let missingQuestion = false;
   const additionType = getAdditionType(state.settings.additionType).id;
 
-  if (additionType === "mixed-no-carry") {
+  if (additionType === "missing-1-1") {
+    [first, second] = buildOneDigitAddendsAboveTen();
+    setMissingAddendQuestion(first, second);
+    missingQuestion = true;
+  } else if (additionType === "mixed-no-carry") {
     [first, second] = buildMixedAddends(false);
   } else if (additionType === "mixed-carry") {
     [first, second] = buildMixedAddends(true);
+  } else if (additionType === "missing-mixed-no-carry") {
+    [first, second] = buildMixedAddends(false);
+    setMissingAddendQuestion(first, second);
+    missingQuestion = true;
+  } else if (additionType === "missing-mixed-carry") {
+    [first, second] = buildMixedAddends(true);
+    setMissingAddendQuestion(first, second);
+    missingQuestion = true;
   } else if (additionType === "2-2-no-carry") {
     [first, second] = buildTwoDigitAddends(false);
   } else if (additionType === "2-2-carry") {
@@ -243,8 +281,10 @@ function buildQuestion() {
     [first, second] = buildOneDigitAddendsAboveTen();
   }
 
-  state.correctAnswer = first + second;
-  state.currentQuestion = `${first} + ${second}`;
+  if (!missingQuestion) {
+    setSumQuestion(first, second);
+  }
+
   elements.question.textContent = state.currentQuestion;
 }
 
@@ -267,6 +307,22 @@ function addSameUnitDistractor(answers) {
 
 function buildAnswers() {
   const answers = new Set([state.correctAnswer]);
+
+  if (state.answerMode === "digit") {
+    while (answers.size < 4) {
+      answers.add(randomInt(1, 9));
+    }
+
+    shuffle([...answers]).forEach((answer, index) => {
+      const button = elements.answers[index];
+      button.textContent = answer;
+      button.dataset.answer = String(answer);
+      button.classList.remove("is-correct", "is-wrong", "is-pressed");
+      button.disabled = false;
+    });
+    return;
+  }
+
   const place = state.correctAnswer > 30 ? 10 : 1;
   const spread = Math.max(5, place * 6);
 
@@ -350,6 +406,7 @@ function currentBonusScore() {
 function recordMistake(selectedAnswer) {
   state.mistakes.push({
     question: state.currentQuestion,
+    correction: state.currentCorrection,
     selectedAnswer,
     correctAnswer: state.correctAnswer,
   });
@@ -378,10 +435,12 @@ function renderCorrections() {
         ? "Nils n'a pas répondu à temps."
         : `Nils a répondu ${mistake.selectedAnswer}.`;
 
+    const correction = mistake.correction || `${mistake.question} = ${mistake.correctAnswer}`;
+
     item.className = "correction-item";
     item.innerHTML = `
-      <div class="correction-sum">${mistake.question}</div>
-      <div class="correction-answer">= ${mistake.correctAnswer}</div>
+      <div class="correction-sum">${correction}</div>
+      <div class="correction-answer">Bonne réponse : ${mistake.correctAnswer}</div>
       <div class="correction-note">${note}</div>
     `;
     elements.correctionsList.append(item);
@@ -495,6 +554,8 @@ function restartGame() {
   state.level = 1;
   state.lives = MAX_LIVES;
   state.currentQuestion = "";
+  state.currentCorrection = "";
+  state.answerMode = "sum";
   state.mistakes = [];
   state.pausedRemaining = null;
   state.locked = false;
