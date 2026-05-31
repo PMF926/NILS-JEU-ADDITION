@@ -286,6 +286,7 @@ function buildQuestion() {
   }
 
   elements.question.textContent = state.currentQuestion;
+  elements.question.classList.toggle("is-hole-question", state.answerMode === "digit");
 }
 
 function addSameUnitDistractor(answers) {

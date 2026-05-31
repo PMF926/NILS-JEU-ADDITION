@@ -340,6 +340,11 @@ button {
   line-height: 1;
   font-weight: 900;
   color: #031a4b;
+  white-space: nowrap;
+}
+
+#question.is-hole-question {
+  font-size: clamp(46px, 6vw, 88px);
 }
 
 .answers {
@@ -1148,6 +1153,10 @@ button {
     font-size: clamp(68px, 15vw, 104px);
   }
 
+  #question.is-hole-question {
+    font-size: clamp(42px, 9.2vw, 64px);
+  }
+
   .answers {
     top: 516px;
     width: calc(100vw - 46px);
@@ -1263,6 +1272,10 @@ button {
 
   #question {
     font-size: clamp(66px, 7vw, 98px);
+  }
+
+  #question.is-hole-question {
+    font-size: clamp(44px, 5.5vw, 72px);
   }
 
   .answers {
