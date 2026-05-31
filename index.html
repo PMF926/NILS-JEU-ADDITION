@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#049ce9" />
+    <title>Nils, le meilleur en calcul</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell" aria-label="Jeu d'additions Nils, le meilleur en calcul">
+      <section class="stage">
+        <div class="hud hud-score" aria-label="Score">
+          <div class="icon-badge star" aria-hidden="true">★</div>
+          <div>
+            <span>Score</span>
+            <strong id="score">0</strong>
+          </div>
+        </div>
+
+        <div class="hud hud-time" aria-live="polite" aria-label="Temps restant">
+          <div class="timer-icon" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <span>Temps</span>
+            <strong id="timer">00:08</strong>
+          </div>
+        </div>
+
+        <div class="hud hud-lives" aria-label="Vies restantes">
+          <div class="heart" aria-hidden="true">♥</div>
+          <strong>x <span id="lives">3</span></strong>
+        </div>
+
+        <button class="round-button settings-button" id="settingsButton" type="button" aria-label="Réglages">
+          <span aria-hidden="true">⚙</span>
+        </button>
+
+        <button class="round-button sound-button" id="soundButton" type="button" aria-label="Son activé">
+          <span aria-hidden="true">♪</span>
+        </button>
+
+        <div class="title-block">
+          <h1>Nils</h1>
+          <p class="tagline">Le meilleur en calcul</p>
+          <p>Trouve le bon résultat le plus vite possible&nbsp;!</p>
+        </div>
+
+        <section class="question-card" aria-live="assertive">
+          <div id="question">3 + 4</div>
+        </section>
+
+        <section class="answers" aria-label="Choix de réponses">
+          <button class="answer answer-blue" type="button"></button>
+          <button class="answer answer-green" type="button"></button>
+          <button class="answer answer-orange" type="button"></button>
+          <button class="answer answer-purple" type="button"></button>
+        </section>
+
+        <div class="lightning" aria-hidden="true">
+          <span></span>
+        </div>
+
+        <section class="bottom-panel best-panel" aria-label="Meilleur score">
+          <div class="medal" aria-hidden="true">★</div>
+          <div>
+            <span>Meilleur score</span>
+            <strong id="bestScore">0</strong>
+          </div>
+        </section>
+
+        <section class="bottom-panel bonus-panel" aria-label="Bonus vitesse">
+          <span class="bolt-mini" aria-hidden="true">ϟ</span>
+          <div class="bonus-track">
+            <div id="bonusBar"></div>
+          </div>
+        </section>
+
+        <section class="bottom-panel level-panel" aria-label="Niveau">
+          <div>
+            <span>Question</span>
+            <strong><span id="level">1</span> / <span id="totalQuestions">10</span></strong>
+          </div>
+          <div class="cup" aria-hidden="true">★</div>
+        </section>
+
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+
+        <dialog class="game-dialog" id="gameDialog" aria-labelledby="dialogTitle">
+          <div class="dialog-card">
+            <h2 id="dialogTitle">Bravo&nbsp;!</h2>
+            <p id="dialogText">Tu as terminé la partie.</p>
+            <section class="corrections-panel" id="correctionsPanel" aria-label="Corrections des erreurs" hidden>
+              <h3>Corrections</h3>
+              <div class="corrections-list" id="correctionsList"></div>
+            </section>
+            <div class="result-actions">
+              <button id="restartButton" type="button">Rejouer</button>
+              <button id="resultSettingsButton" type="button">Réglages</button>
+              <button id="stopButton" type="button">Arrêt</button>
+            </div>
+          </div>
+        </dialog>
+
+        <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+          <form class="settings-card" method="dialog">
+            <h2 id="settingsTitle">Réglages</h2>
+
+            <div class="setting-row">
+              <label for="additionTypeSetting">Type d'addition</label>
+              <div class="setting-stepper addition-type-stepper">
+                <button type="button" data-setting="additionType" data-delta="-1" aria-label="Type précédent">-</button>
+                <strong><output id="additionTypeValue">1 + 1</output></strong>
+                <button type="button" data-setting="additionType" data-delta="1" aria-label="Type suivant">+</button>
+              </div>
+              <input id="additionTypeSetting" name="additionType" type="range" min="0" max="4" step="1" value="0" />
+            </div>
+
+            <div class="setting-row">
+              <label for="questionsSetting">Questions</label>
+              <div class="setting-stepper">
+                <button type="button" data-setting="questions" data-delta="-1" aria-label="Moins de questions">-</button>
+                <strong><output id="questionsValue">10</output></strong>
+                <button type="button" data-setting="questions" data-delta="1" aria-label="Plus de questions">+</button>
+              </div>
+              <input id="questionsSetting" name="questions" type="range" min="5" max="30" step="5" value="10" />
+            </div>
+
+            <div class="setting-row">
+              <label for="speedSetting">Temps par réponse</label>
+              <div class="setting-stepper">
+                <button type="button" data-setting="seconds" data-delta="-1" aria-label="Moins de temps">-</button>
+                <strong><output id="speedValue">8 s</output></strong>
+                <button type="button" data-setting="seconds" data-delta="1" aria-label="Plus de temps">+</button>
+              </div>
+              <input id="speedSetting" name="speed" type="range" min="4" max="120" step="1" value="8" />
+            </div>
+
+            <div class="settings-actions">
+              <button class="settings-secondary" id="closeSettingsButton" type="button">Fermer</button>
+              <button class="settings-primary" id="applySettingsButton" type="button">Appliquer</button>
+            </div>
+          </form>
+        </dialog>
+
+        <section class="stop-screen" id="stopScreen" aria-live="polite" hidden>
+          <div>
+            <h2>Application arrêtée</h2>
+            <p>Tu peux fermer cette fenêtre.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
