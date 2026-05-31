@@ -318,7 +318,7 @@ button {
 .question-card {
   position: absolute;
   left: 50%;
-  top: clamp(296px, 36vh, 360px);
+  top: clamp(320px, 38vh, 385px);
   width: min(45.5vw, 700px);
   min-width: 470px;
   height: clamp(165px, 23.5vh, 250px);
@@ -345,7 +345,7 @@ button {
 .answers {
   position: absolute;
   left: 50%;
-  top: clamp(505px, 64.5vh, 610px);
+  top: clamp(530px, 67vh, 635px);
   width: min(71vw, 1100px);
   transform: translateX(-50%);
   display: grid;
@@ -1042,14 +1042,14 @@ button {
   }
 
   .question-card {
-    top: 284px;
+    top: 310px;
     width: 55vw;
     min-width: 440px;
     height: 168px;
   }
 
   .answers {
-    top: 486px;
+    top: 512px;
     width: 78vw;
   }
 
@@ -1138,7 +1138,7 @@ button {
   }
 
   .question-card {
-    top: 338px;
+    top: 360px;
     width: calc(100vw - 58px);
     min-width: 0;
     height: 148px;
@@ -1149,7 +1149,7 @@ button {
   }
 
   .answers {
-    top: 494px;
+    top: 516px;
     width: calc(100vw - 46px);
     grid-template-columns: repeat(2, minmax(130px, 1fr));
     gap: 12px;
@@ -1257,7 +1257,7 @@ button {
   }
 
   .question-card {
-    top: 254px;
+    top: 272px;
     height: 144px;
   }
 
@@ -1266,7 +1266,7 @@ button {
   }
 
   .answers {
-    top: 426px;
+    top: 446px;
   }
 
   .answer {
