@@ -3,6 +3,7 @@ const BEST_SCORE_KEY = "reflexe-eclair-best-score";
 const SETTINGS_KEY = "nils-calcul-settings";
 const ADDITION_TYPES = [
   { id: "1-1", label: "1 + 1", scoreBonus: 0 },
+  { id: "add-nine", label: "Addition de 9", scoreBonus: 70 },
   { id: "missing-1-1", label: "1 + 1 à trou", scoreBonus: 50 },
   { id: "mixed-no-carry", label: "1 + 2 ou 2 + 1 sans retenue", scoreBonus: 80 },
   { id: "missing-mixed-no-carry", label: "1 + 2 ou 2 + 1 à trou sans retenue", scoreBonus: 120 },
@@ -209,6 +210,12 @@ function buildOneDigitAddendsAboveTen() {
   return maybeSwapAddends(first, second);
 }
 
+function buildNineAddends() {
+  const other = Math.random() < 0.5 ? randomInt(1, 9) : randomInt(10, 99);
+
+  return maybeSwapAddends(9, other);
+}
+
 function buildMixedAddends(hasCarry) {
   const oneDigit = hasCarry ? randomInt(2, 9) : randomInt(1, 9);
   const unit = hasCarry ? randomInt(11 - oneDigit, 9) : randomInt(0, Math.min(9, 10 - oneDigit));
@@ -261,6 +268,8 @@ function buildQuestion() {
     [first, second] = buildOneDigitAddendsAboveTen();
     setMissingAddendQuestion(first, second);
     missingQuestion = true;
+  } else if (additionType === "add-nine") {
+    [first, second] = buildNineAddends();
   } else if (additionType === "mixed-no-carry") {
     [first, second] = buildMixedAddends(false);
   } else if (additionType === "mixed-carry") {
