@@ -11,6 +11,7 @@ const ADDITION_TYPES = [
   { id: "missing-mixed-carry", label: "1 + 2 ou 2 + 1 à trou avec retenue", scoreBonus: 170 },
   { id: "2-2-no-carry", label: "2 + 2 sans retenue", scoreBonus: 170 },
   { id: "2-2-carry", label: "2 + 2 avec retenue", scoreBonus: 230 },
+  { id: "repeated-addition", label: "Intro multiplication", scoreBonus: 210 },
 ];
 const DEFAULT_SETTINGS = {
   additionType: "1-1",
@@ -239,10 +240,25 @@ function buildTwoDigitAddends(hasCarry) {
   return [tenA + unitA, tenB + unitB];
 }
 
+function buildRepeatedAddends() {
+  const value = randomInt(1, 10);
+  const maxTerms = value <= 3 ? 5 : value <= 6 ? 4 : 3;
+  const termCount = randomInt(3, maxTerms);
+
+  return Array(termCount).fill(value);
+}
+
 function setSumQuestion(first, second) {
   state.answerMode = "sum";
   state.correctAnswer = first + second;
   state.currentQuestion = `${first} + ${second}`;
+  state.currentCorrection = `${state.currentQuestion} = ${state.correctAnswer}`;
+}
+
+function setRepeatedQuestion(addends) {
+  state.answerMode = "sum";
+  state.correctAnswer = addends.reduce((total, value) => total + value, 0);
+  state.currentQuestion = addends.join(" + ");
   state.currentCorrection = `${state.currentQuestion} = ${state.correctAnswer}`;
 }
 
@@ -261,13 +277,13 @@ function setMissingAddendQuestion(first, second) {
 function buildQuestion() {
   let first;
   let second;
-  let missingQuestion = false;
+  let customQuestion = false;
   const additionType = getAdditionType(state.settings.additionType).id;
 
   if (additionType === "missing-1-1") {
     [first, second] = buildOneDigitAddendsAboveTen();
     setMissingAddendQuestion(first, second);
-    missingQuestion = true;
+    customQuestion = true;
   } else if (additionType === "add-nine") {
     [first, second] = buildNineAddends();
   } else if (additionType === "mixed-no-carry") {
@@ -277,25 +293,29 @@ function buildQuestion() {
   } else if (additionType === "missing-mixed-no-carry") {
     [first, second] = buildMixedAddends(false);
     setMissingAddendQuestion(first, second);
-    missingQuestion = true;
+    customQuestion = true;
   } else if (additionType === "missing-mixed-carry") {
     [first, second] = buildMixedAddends(true);
     setMissingAddendQuestion(first, second);
-    missingQuestion = true;
+    customQuestion = true;
   } else if (additionType === "2-2-no-carry") {
     [first, second] = buildTwoDigitAddends(false);
   } else if (additionType === "2-2-carry") {
     [first, second] = buildTwoDigitAddends(true);
+  } else if (additionType === "repeated-addition") {
+    setRepeatedQuestion(buildRepeatedAddends());
+    customQuestion = true;
   } else {
     [first, second] = buildOneDigitAddendsAboveTen();
   }
 
-  if (!missingQuestion) {
+  if (!customQuestion) {
     setSumQuestion(first, second);
   }
 
   elements.question.textContent = state.currentQuestion;
   elements.question.classList.toggle("is-hole-question", state.answerMode === "digit");
+  elements.question.classList.toggle("is-repeated-question", additionType === "repeated-addition");
 }
 
 function addSameUnitDistractor(answers) {
