@@ -4,6 +4,7 @@ const SETTINGS_KEY = "nils-calcul-settings";
 const ADDITION_TYPES = [
   { id: "1-1", label: "1 + 1", scoreBonus: 0 },
   { id: "add-nine", label: "Addition de 9", scoreBonus: 70 },
+  { id: "repeated-addition", label: "Intro multiplication", scoreBonus: 210 },
   { id: "missing-1-1", label: "1 + 1 à trou", scoreBonus: 50 },
   { id: "mixed-no-carry", label: "1 + 2 ou 2 + 1 sans retenue", scoreBonus: 80 },
   { id: "missing-mixed-no-carry", label: "1 + 2 ou 2 + 1 à trou sans retenue", scoreBonus: 120 },
@@ -11,7 +12,6 @@ const ADDITION_TYPES = [
   { id: "missing-mixed-carry", label: "1 + 2 ou 2 + 1 à trou avec retenue", scoreBonus: 170 },
   { id: "2-2-no-carry", label: "2 + 2 sans retenue", scoreBonus: 170 },
   { id: "2-2-carry", label: "2 + 2 avec retenue", scoreBonus: 230 },
-  { id: "repeated-addition", label: "Intro multiplication", scoreBonus: 210 },
 ];
 const DEFAULT_SETTINGS = {
   additionType: "1-1",
