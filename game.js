@@ -6,6 +6,7 @@ const ADDITION_TYPES = [
   { id: "add-nine", label: "Addition de 9", scoreBonus: 70 },
   { id: "repeated-addition", label: "Intro multiplication", scoreBonus: 210 },
   { id: "carry-one", label: "Retenue 1", scoreBonus: 150 },
+  { id: "next-ten-missing", label: "Dizaine supérieure", scoreBonus: 160 },
   { id: "missing-1-1", label: "1 + 1 à trou", scoreBonus: 50 },
   { id: "mixed-no-carry", label: "1 + 2 ou 2 + 1 sans retenue", scoreBonus: 80 },
   { id: "missing-mixed-no-carry", label: "1 + 2 ou 2 + 1 à trou sans retenue", scoreBonus: 120 },
@@ -257,6 +258,10 @@ function buildCarryOneAddends() {
   return [1, first, second];
 }
 
+function buildNextTenNumber() {
+  return randomInt(1, 9) * 10 + randomInt(1, 9);
+}
+
 function setSumQuestion(first, second) {
   state.answerMode = "sum";
   state.correctAnswer = first + second;
@@ -281,6 +286,17 @@ function setMissingAddendQuestion(first, second) {
   state.correctAnswer = missing;
   state.currentQuestion = hideFirst ? `_ + ${visible} = ${total}` : `${visible} + _ = ${total}`;
   state.currentCorrection = `${first} + ${second} = ${total}`;
+}
+
+function setNextTenMissingQuestion(value) {
+  const missing = 10 - (value % 10);
+  const total = value + missing;
+  const hideFirst = Math.random() < 0.5;
+
+  state.answerMode = "digit";
+  state.correctAnswer = missing;
+  state.currentQuestion = hideFirst ? `_ + ${value} = ${total}` : `${value} + _ = ${total}`;
+  state.currentCorrection = hideFirst ? `${missing} + ${value} = ${total}` : `${value} + ${missing} = ${total}`;
 }
 
 function buildQuestion() {
@@ -316,6 +332,9 @@ function buildQuestion() {
     customQuestion = true;
   } else if (additionType === "carry-one") {
     setRepeatedQuestion(buildCarryOneAddends());
+    customQuestion = true;
+  } else if (additionType === "next-ten-missing") {
+    setNextTenMissingQuestion(buildNextTenNumber());
     customQuestion = true;
   } else {
     [first, second] = buildOneDigitAddendsAboveTen();
